@@ -3,18 +3,15 @@
 ## Base Docker Image ##
 * [centos:7](https://hub.docker.com/_/centos/)
 
-## RoadMap
-- ~~1.3.1.6 + 1 : defaulting to openjdk~~
-- 1.3.1.6 + 2 : switch to non root user
-- 1.3.1.6 + 3 : switch to alpine linux
+Based on https://github.com/sheepkiller/kafka-manager-docker/, this image uses an embed Zookeeper instance. This makes the deployment way easier/cheaper, but also makes it volatile: Throw down the container, and the configuration is lost. Essentially, ideal for local running.
+
+The Dockerfile was also refactored to use multi-stage build, because why not?
 
 ## Howto
 ### Quick Start
 ```
-docker run -it --rm  -p 9000:9000 -e ZK_HOSTS="your-zk.domain:2181" -e APPLICATION_SECRET=letmein sheepkiller/kafka-manager
+docker run -it --rm  -p 9000:9000 nicovillanueva/kafka-manager
 ```
-(if you don't define ZK_HOSTS, default value has been set to "localhost:2181")
-
 
 ### Use your own configuration file
 Until 1.3.0.4, you were able to override default configuration file via a docker volume to overi:
@@ -23,17 +20,17 @@ docker run [...] -v /path/to/confdir:/kafka-manager-${KM_VERSION}/conf [...]
 ```
 From > 1.3.0.4, you can specify a configuration file via an environment variable.
 ```
-docker run [...] -v /path/to/confdir:/opt -e KM_CONFIG=/opt/my_shiny.conf sheepkiller/kafka-manager
+docker run [...] -v /path/to/confdir:/opt -e KM_CONFIG=/opt/my_shiny.conf nicovillanueva/kafka-manager
 ```
 
 ### Pass arguments to kafka-manager
 For release <= 1.3.0.4, you can pass options via command/args.
 ```
-docker run -it --rm  -p 9000:9000 -e ZK_HOSTS="your-zk.domain:2181" -e APPLICATION_SECRET=letmein sheepkiller/kafka-manager -Djava.net.preferIPv4Stack=true
+docker run -it --rm  -p 9000:9000 -e APPLICATION_SECRET=letmein nicovillanueva/kafka-manager -Djava.net.preferIPv4Stack=true
 ```
 For release > 1.3.0.4, you can use env variable `KM_ARGS`.
 ```
-docker run -it --rm  -p 9000:9000 -e ZK_HOSTS="your-zk.domain:2181" -e APPLICATION_SECRET=letmein -e KM_ARGS=-Djava.net.preferIPv4Stack=true sheepkiller/kafka-manager 
+docker run -it --rm  -p 9000:9000 -e APPLICATION_SECRET=letmein -e KM_ARGS=-Djava.net.preferIPv4Stack=true nicovillanueva/kafka-manager
 ```
 
 ### Specify a revision
